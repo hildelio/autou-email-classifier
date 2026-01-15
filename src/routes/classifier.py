@@ -33,8 +33,12 @@ async def analyze_email(file: UploadFile, request: Request):
         import tempfile
         from pathlib import Path
 
+        print(f"=== DEBUG: Received file {file.filename}, content_type: {file.content_type} ===")
+        
         with tempfile.NamedTemporaryFile(delete=False, suffix=Path(file.filename).suffix) as tmp:
             content = await file.read()
+            
+            print(f"DEBUG: File content size: {len(content)} bytes")
 
             # Validar arquivo não vazio
             if not content or len(content) == 0:
@@ -48,16 +52,23 @@ async def analyze_email(file: UploadFile, request: Request):
 
             tmp.write(content)
             tmp_path = tmp.name
+            print(f"DEBUG: Saved to temp file: {tmp_path}")
 
         try:
             # Parse do arquivo
+            print(f"=== DEBUG: Parsing file {file.filename} ===")
             email_content = FileParserService.parse_file(tmp_path)
+            print(f"DEBUG: Extracted text length: {len(email_content)}")
+            print(f"DEBUG: First 500 chars: {email_content[:500]!r}")
 
             if not email_content or len(email_content.strip()) == 0:
+                print(f"DEBUG: Text is empty after strip! Original length was {len(email_content)}")
                 raise HTTPException(
                     status_code=400,
                     detail="Arquivo vazio ou sem conteúdo válido",
                 )
+
+            print(f"DEBUG: Text validation passed. Length: {len(email_content)}")
 
             # Validar conteúdo extraído para segurança
             SecurityService.validate_input_content(email_content)

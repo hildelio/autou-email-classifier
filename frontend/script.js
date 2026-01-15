@@ -44,7 +44,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 // File upload handling
-dropZone.addEventListener('click', () => fileInput.click());
+// Note: dropZone is a label with for="fileInput", so clicking it automatically
+// triggers the file input. No need for explicit click handler.
 
 fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -53,6 +54,7 @@ fileInput.addEventListener('change', (e) => {
     }
 });
 
+// Drag and drop handlers
 dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
     dropZone.classList.add('border-blue-500', 'bg-blue-100');
@@ -342,7 +344,7 @@ function resetForm() {
 /**
  * Copy result to clipboard
  */
-async function copyResult() {
+async function copyResult(event) {
     if (!lastResult) return;
 
     const text = `
@@ -362,14 +364,16 @@ ${lastResult.reasoning}
     try {
         await navigator.clipboard.writeText(text);
 
-        // Show feedback
-        const btn = event.target;
-        const originalText = btn.textContent;
-        btn.textContent = '✓ Copiado!';
+        // Show feedback - use event.currentTarget if available, otherwise find the button
+        const btn = (event && event.currentTarget) || document.querySelector('button[onclick*="copyResult"]');
+        if (btn) {
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Copiado!';
 
-        setTimeout(() => {
-            btn.textContent = originalText;
-        }, 2000);
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 2000);
+        }
     } catch (error) {
         console.error('Erro ao copiar:', error);
         alert('Erro ao copiar resultado');
