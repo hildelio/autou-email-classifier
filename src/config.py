@@ -19,4 +19,3 @@ if not GEMINI_API_KEY:
 
 if not GEMINI_MODEL:
     raise ValueError("GEMINI_MODEL environment variable is required")
-
