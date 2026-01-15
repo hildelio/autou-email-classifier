@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autou Email Classifier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">
+                    Autou Email Classifier
+                </h1>
+                <p class="text-lg text-gray-600">
+                    Classificação inteligente de emails com IA
+                </p>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+                <div id="dropZone" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition">
+                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M28 8H12a4 4 0 00-4 4v20a4 4 0 004 4h24a4 4 0 004-4V20m-8-12l-4-4m0 0l-4 4m4-4v16"></path>
+                    </svg>
+                    <p class="text-gray-600 mb-2">Clique para enviar ou arraste um arquivo</p>
+                    <p class="text-sm text-gray-500">PDF ou TXT (máximo 10MB)</p>
+                </div>
+                <input type="file" id="fileInput" class="hidden" accept=".pdf,.txt">
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading" class="hidden mb-6">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center">
+                    <div class="animate-spin h-5 w-5 text-blue-600 mr-3"></div>
+                    <p class="text-blue-700">Processando arquivo...</p>
+                </div>
+            </div>
+
+            <!-- Result -->
+            <div id="result" class="hidden">
+                <div class="bg-white rounded-lg shadow-lg p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Resultado</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Categoria</label>
+                            <p id="resultCategory" class="text-lg text-indigo-600 font-bold"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Resposta</label>
+                            <p id="resultReply" class="text-gray-700 leading-relaxed"></p>
+                        </div>
+                    </div>
+                    <button onclick="resetForm()" class="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition">
+                        Enviar outro arquivo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
