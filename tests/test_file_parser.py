@@ -62,11 +62,44 @@ class TestFileParserService:
         """Test text cleaning"""
         dirty_text = "  This   is   a   test  \n  with   spaces  "
         cleaned = FileParserService.clean_text(dirty_text)
-        assert cleaned == "This is a test with spaces"
+        # Current implementation collapses all whitespace to single spaces
+        assert "This is a test with spaces" == cleaned
+
+    def test_clean_text_collapses_whitespace(self):
+        """Test that clean_text collapses all types of whitespace"""
+        text_with_breaks = "Line 1\nLine 2\nLine 3"
+        cleaned = FileParserService.clean_text(text_with_breaks)
+        # Current behavior: all newlines become spaces
+        assert "Line 1 Line 2 Line 3" == cleaned
+
+    def test_clean_text_removes_empty_lines(self):
+        """Test that clean_text handles excessive whitespace"""
+        text = "Line 1\n\n\n\nLine 2\n\n"
+        cleaned = FileParserService.clean_text(text)
+        assert "Line 1" in cleaned
+        assert "Line 2" in cleaned
+
+    def test_clean_text_multiple_spaces(self):
+        """Test cleaning multiple spaces on the same line"""
+        text = "Too    many     spaces"
+        cleaned = FileParserService.clean_text(text)
+        assert cleaned == "Too many spaces"
+
+    def test_clean_text_mixed_whitespace(self):
+        """Test cleaning various whitespace characters"""
+        text = "Text\twith\ttabs\n  and   spaces  "
+        cleaned = FileParserService.clean_text(text)
+        # All whitespace collapsed to single spaces
+        assert "Text with tabs and spaces" == cleaned
 
     def test_clean_text_empty(self):
         """Test cleaning empty text"""
         result = FileParserService.clean_text("")
+        assert result == ""
+
+    def test_clean_text_only_whitespace(self):
+        """Test cleaning text with only whitespace"""
+        result = FileParserService.clean_text("   \n\n   \n  ")
         assert result == ""
 
     def test_file_not_found(self):
@@ -107,3 +140,18 @@ class TestFileParserService:
         """Test supported file extensions"""
         assert ".pdf" in FileParserService.SUPPORTED_EXTENSIONS
         assert ".txt" in FileParserService.SUPPORTED_EXTENSIONS
+
+    def test_parse_txt_latin1_encoding(self):
+        """Test parsing TXT with latin-1 encoding"""
+        with tempfile.NamedTemporaryFile(
+            mode="wb", suffix=".txt", delete=False
+        ) as f:
+            # Write text that will fail with UTF-8 but work with latin-1
+            f.write(b"Caf\xe9")  # 'Café' in latin-1
+            temp_path = f.name
+
+        try:
+            result = FileParserService.parse_txt(temp_path)
+            assert "Caf" in result  # Should contain the text
+        finally:
+            Path(temp_path).unlink()
