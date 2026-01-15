@@ -143,7 +143,7 @@ Pronto! A API usará o novo modelo sem mexer no código.
   - [x] GitHub Actions CI (ruff + pytest + coverage)
 - [ ] **Fase 2**: Backend Core
   - [x] File Parser (PDF/TXT)
-  - [ ] AI Service (Gemini integration)
+  - [X] AI Service (Gemini integration)
   - [ ] Endpoints (POST /analyze)
 - [ ] **Fase 3**: Frontend
   - [ ] Interface Web (HTML/CSS/JS)

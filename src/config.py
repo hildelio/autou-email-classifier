@@ -4,6 +4,11 @@ Configuration Management - Simple and Straightforward
 
 from os import getenv
 
+from dotenv import load_dotenv
+
+# Carregar variáveis de ambiente do arquivo .env
+load_dotenv()
+
 # Application Settings
 APP_NAME = "Autou Email Classifier"
 APP_VERSION = "0.1.0"

@@ -5,7 +5,6 @@ import pypdf
 
 
 class FileParserService:
-
     SUPPORTED_EXTENSIONS = {".pdf", ".txt"}
     MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 
