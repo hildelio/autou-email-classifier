@@ -143,9 +143,7 @@ class TestFileParserService:
 
     def test_parse_txt_latin1_encoding(self):
         """Test parsing TXT with latin-1 encoding"""
-        with tempfile.NamedTemporaryFile(
-            mode="wb", suffix=".txt", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".txt", delete=False) as f:
             # Write text that will fail with UTF-8 but work with latin-1
             f.write(b"Caf\xe9")  # 'Café' in latin-1
             temp_path = f.name
