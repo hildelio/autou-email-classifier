@@ -34,10 +34,10 @@ async def analyze_email(file: UploadFile, request: Request):
         from pathlib import Path
 
         print(f"=== DEBUG: Received file {file.filename}, content_type: {file.content_type} ===")
-        
+
         with tempfile.NamedTemporaryFile(delete=False, suffix=Path(file.filename).suffix) as tmp:
             content = await file.read()
-            
+
             print(f"DEBUG: File content size: {len(content)} bytes")
 
             # Validar arquivo não vazio
