@@ -107,10 +107,33 @@ Fluxo de trabalho:
 ## 🔒 Variáveis de Ambiente
 
 ```env
+# Google Gemini API Key
 GEMINI_API_KEY=sua_chave_aqui
+
+# Model selection (opcional, default: gemini-2.5-flash)
+GEMINI_MODEL=gemini-2.5-flash
+
+# Application environment
 ENVIRONMENT=production
 DEBUG=false
 ```
+
+### Gerenciamento de Configuração
+
+A aplicação usa **Pydantic Settings** (`src/config.py`) para gerenciar configurações:
+
+- **Carregamento centralizado**: Todas as settings em um único arquivo
+- **Type-safe**: Validação automática de tipos
+- **Environment-aware**: Diferentes valores por ambiente (dev/prod)
+- **Easy maintenance**: Trocar o modelo Gemini sem alterar código
+
+**Exemplo**: Para usar `gemini-3.0-pro` em produção:
+```bash
+export GEMINI_MODEL=gemini-3.0-pro
+docker-compose up
+```
+
+Pronto! A API usará o novo modelo sem mexer no código.
 
 ## 📝 Roadmap
 
