@@ -6,6 +6,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from src.routes.classifier import router as classifier_router
+
 app = FastAPI(
     title="Autou Email Classifier",
     description="API para classificação de emails usando IA",
@@ -20,6 +22,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(classifier_router)
 
 
 @app.get("/health")
