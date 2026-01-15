@@ -137,20 +137,20 @@ Pronto! A API usará o novo modelo sem mexer no código.
 
 ## 📝 Roadmap
 
-- [ ] **Fase 1**: Fundação e CI
+- [x] **Fase 1**: Fundação e CI ✅ COMPLETA
   - [x] Estrutura de pastas
-  - [ ] Dockerfile otimizado
-  - [ ] GitHub Actions CI
+  - [x] Dockerfile otimizado (multi-stage build)
+  - [x] GitHub Actions CI (ruff + pytest + coverage)
 - [ ] **Fase 2**: Backend Core
-  - [ ] File Parser
-  - [ ] AI Service
-  - [ ] Endpoints
+  - [x] File Parser (PDF/TXT)
+  - [ ] AI Service (Gemini integration)
+  - [ ] Endpoints (POST /analyze)
 - [ ] **Fase 3**: Frontend
-  - [ ] Interface Web
+  - [ ] Interface Web (HTML/CSS/JS)
   - [ ] Integração Frontend-Backend
 - [ ] **Fase 4**: Deploy
-  - [ ] Deploy em produção
-  - [ ] Documentação
+  - [ ] Deploy em produção (Render/Railway)
+  - [ ] Documentação final
   - [ ] Vídeo demonstrativo
 
 ## 📄 Licença
