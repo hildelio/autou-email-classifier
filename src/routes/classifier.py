@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi import APIRouter, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 
 from src.services.ai_service import AIService
 from src.services.file_parser import FileParserService
+from src.services.security_service import SecurityService
 
 router = APIRouter(prefix="/api", tags=["classification"])
 
@@ -15,7 +16,10 @@ class ClassificationResponse(BaseModel):
 
 
 @router.post("/analyze", response_model=ClassificationResponse)
-async def analyze_email(file: UploadFile):
+async def analyze_email(file: UploadFile, request: Request):
+    # Rate limiting validation
+    SecurityService.validate_rate_limit(request)
+
     # Validar tipo de arquivo
     allowed_types = {"application/pdf", "text/plain"}
     if file.content_type not in allowed_types:
@@ -39,6 +43,9 @@ async def analyze_email(file: UploadFile):
                     detail="Arquivo vazio ou sem conteúdo válido",
                 )
 
+            # Validar tamanho do arquivo
+            SecurityService.validate_file_size(len(content))
+
             tmp.write(content)
             tmp_path = tmp.name
 
@@ -52,9 +59,15 @@ async def analyze_email(file: UploadFile):
                     detail="Arquivo vazio ou sem conteúdo válido",
                 )
 
+            # Validar conteúdo extraído para segurança
+            SecurityService.validate_input_content(email_content)
+
             # Classificação com IA
             ai_service = AIService()
             result = await ai_service.classify_email(email_content)
+
+            # Record successful request for rate limiting
+            SecurityService.record_request(request)
 
             return ClassificationResponse(**result)
 
