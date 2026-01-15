@@ -25,4 +25,4 @@ def test_root_endpoint(client):
     """Teste do endpoint raiz"""
     response = client.get("/")
     assert response.status_code == 200
-    assert "message" in response.json()
+    assert response.headers["content-type"] == "text/html; charset=utf-8"
