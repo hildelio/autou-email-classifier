@@ -153,3 +153,76 @@ class TestFileParserService:
             assert "Caf" in result  # Should contain the text
         finally:
             Path(temp_path).unlink()
+
+    # --- OCR Integration Tests ---
+
+    @pytest.mark.asyncio
+    async def test_parse_pdf_with_ocr_unavailable(self, temp_pdf_file):
+        """Test parsing scanned PDF without OCR configured"""
+        from unittest.mock import MagicMock, patch
+
+        # Mock empty PDF (no extractable text)
+        with open(temp_pdf_file, "rb") as f:
+            mock_reader = MagicMock()
+            mock_page = MagicMock()
+            mock_page.extract_text.return_value = ""
+            mock_reader.pages = [mock_page]
+
+            with patch("pypdf.PdfReader", return_value=mock_reader):
+                # Ensure OCR is not available
+                with patch.dict("src.config.__dict__", {"OCR_SPACE_API_KEY": None}):
+                    with pytest.raises(
+                        ValueError, match="PDF não contém texto extraível"
+                    ):
+                        await FileParserService.parse_pdf(temp_pdf_file)
+
+    @pytest.mark.asyncio
+    async def test_parse_pdf_with_ocr_success(self, temp_pdf_file):
+        """Test parsing scanned PDF with OCR fallback"""
+        from unittest.mock import AsyncMock, MagicMock, patch
+
+        # Mock empty PDF (no extractable text)
+        mock_reader = MagicMock()
+        mock_page = MagicMock()
+        mock_page.extract_text.return_value = ""
+        mock_reader.pages = [mock_page]
+
+        with patch("pypdf.PdfReader", return_value=mock_reader):
+            # Make OCR available
+            with patch.dict("src.config.__dict__", {"OCR_SPACE_API_KEY": "test_key"}):
+                # Mock successful OCR extraction
+                mock_ocr_result = AsyncMock(return_value="OCR extracted text")
+                with patch(
+                    "src.services.ocr_service.OCRService.extract_text_from_pdf",
+                    mock_ocr_result,
+                ):
+                    result = await FileParserService.parse_pdf(temp_pdf_file)
+                    assert "OCR extracted text" in result
+                    # Verify OCR was called
+                    assert mock_ocr_result.called
+
+    @pytest.mark.asyncio
+    async def test_parse_pdf_prefers_direct_extraction(self, temp_pdf_file):
+        """Test that PDF with extractable text doesn't use OCR"""
+        from unittest.mock import AsyncMock, MagicMock, patch
+
+        # Mock PDF with extractable text
+        mock_reader = MagicMock()
+        mock_page = MagicMock()
+        mock_page.extract_text.return_value = "Direct text from PDF"
+        mock_reader.pages = [mock_page]
+
+        with patch("pypdf.PdfReader", return_value=mock_reader):
+            # Mock OCR (should NOT be called)
+            mock_ocr_result = AsyncMock(return_value="OCR text")
+            with patch(
+                "src.services.ocr_service.OCRService.extract_text_from_pdf",
+                mock_ocr_result,
+            ):
+                result = await FileParserService.parse_pdf(temp_pdf_file)
+                assert "Direct text" in result
+                # OCR should NOT have been called
+                assert not mock_ocr_result.called
+
+
+
