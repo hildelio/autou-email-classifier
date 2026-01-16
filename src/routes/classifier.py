@@ -57,7 +57,7 @@ async def analyze_email(file: UploadFile, request: Request):
         try:
             # Parse do arquivo
             print(f"=== DEBUG: Parsing file {file.filename} ===")
-            email_content = FileParserService.parse_file(tmp_path)
+            email_content = await FileParserService.parse_file(tmp_path)
             print(f"DEBUG: Extracted text length: {len(email_content)}")
             print(f"DEBUG: First 500 chars: {email_content[:500]!r}")
 
