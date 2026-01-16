@@ -46,9 +46,9 @@ class TestFileParserService:
         except Exception:
             pytest.skip("PDF creation failed")
 
-    def test_parse_txt_file(self, temp_txt_file):
+    async def test_parse_txt_file(self, temp_txt_file):
         """Test parsing a TXT file"""
-        result = FileParserService.parse_file(temp_txt_file)
+        result = await FileParserService.parse_file(temp_txt_file)
         assert result is not None
         assert len(result) > 0
         assert "test email" in result
@@ -102,18 +102,18 @@ class TestFileParserService:
         result = FileParserService.clean_text("   \n\n   \n  ")
         assert result == ""
 
-    def test_file_not_found(self):
+    async def test_file_not_found(self):
         """Test error when file not found"""
         with pytest.raises(FileNotFoundError):
-            FileParserService.parse_file("/nonexistent/file.txt")
+            await FileParserService.parse_file("/nonexistent/file.txt")
 
-    def test_unsupported_extension(self):
+    async def test_unsupported_extension(self):
         """Test error for unsupported file type"""
         with tempfile.NamedTemporaryFile(suffix=".doc") as f:
             with pytest.raises(ValueError, match="Tipo de arquivo não suportado"):
-                FileParserService.parse_file(f.name)
+                await FileParserService.parse_file(f.name)
 
-    def test_file_too_large(self):
+    async def test_file_too_large(self):
         """Test error when file exceeds size limit"""
         with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as f:
             # Write data larger than 10MB (simulated)
@@ -130,7 +130,7 @@ class TestFileParserService:
 
             try:
                 with pytest.raises(ValueError, match="Arquivo muito grande"):
-                    FileParserService.parse_file(temp_path)
+                    await FileParserService.parse_file(temp_path)
             finally:
                 Path(temp_path).unlink()
         finally:
