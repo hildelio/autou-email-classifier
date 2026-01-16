@@ -19,6 +19,9 @@ DEBUG = getenv("DEBUG", "true").lower() == "true"
 GEMINI_API_KEY = getenv("GEMINI_API_KEY")
 GEMINI_MODEL = getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
+# OCR Configuration (opcional - apenas para PDFs escaneados)
+OCR_SPACE_API_KEY = getenv("OCR_SPACE_API_KEY")
+
 # Validar configuração crítica apenas em produção
 if ENVIRONMENT == "production":
     if not GEMINI_API_KEY:

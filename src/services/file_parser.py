@@ -9,7 +9,7 @@ class FileParserService:
     MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 
     @staticmethod
-    def parse_file(file_path: str) -> str:
+    async def parse_file(file_path: str) -> str:
         path = Path(file_path)
 
         if not path.exists():
@@ -27,22 +27,54 @@ class FileParserService:
             )
 
         if path.suffix.lower() == ".pdf":
-            text = FileParserService.parse_pdf(str(path))
+            text = await FileParserService.parse_pdf(str(path))
         else:
             text = FileParserService.parse_txt(str(path))
 
         return FileParserService.clean_text(text)
 
     @staticmethod
-    def parse_pdf(file_path: str) -> str:
+    async def parse_pdf(file_path: str) -> str:
+        """
+        Parse PDF file. First tries to extract text directly.
+        Falls back to OCR if no text is found (scanned PDF).
+        """
         try:
             text = ""
             with open(file_path, "rb") as file:
                 reader = pypdf.PdfReader(file)
                 for page in reader.pages:
-                    text += page.extract_text() + "\n"
+                    page_text = page.extract_text()
+                    if page_text:
+                        text += page_text + "\n"
+
+            # If we extracted text successfully, return it
+            if text and text.strip():
+                print(f"Extracted {len(text)} characters from PDF using pypdf")
+                return text
+
+            # No text found - PDF is likely scanned
+            print("PDF has no extractable text. Attempting OCR...")
+
+            # Try OCR as fallback
+            from src.config import OCR_SPACE_API_KEY
+            from src.services.ocr_service import OCRService
+
+            if not OCR_SPACE_API_KEY:
+                raise ValueError(
+                    "PDF não contém texto extraível (PDF escaneado). "
+                    "Para processar PDFs escaneados, configure OCR_SPACE_API_KEY no arquivo .env. "
+                    "Obtenha uma chave grátis em: https://ocr.space/ocrapi"
+                )
+
+            # Use OCR to extract text
+            text = await OCRService.extract_text_from_pdf(file_path)
             return text
+
         except Exception as e:
+            # If it's a ValueError we threw, re-raise it
+            if isinstance(e, ValueError):
+                raise
             raise ValueError(f"Erro ao ler PDF: {str(e)}") from e
 
     @staticmethod
