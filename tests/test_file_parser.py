@@ -162,19 +162,16 @@ class TestFileParserService:
         from unittest.mock import MagicMock, patch
 
         # Mock empty PDF (no extractable text)
-        with open(temp_pdf_file, "rb") as f:
-            mock_reader = MagicMock()
-            mock_page = MagicMock()
-            mock_page.extract_text.return_value = ""
-            mock_reader.pages = [mock_page]
+        mock_reader = MagicMock()
+        mock_page = MagicMock()
+        mock_page.extract_text.return_value = ""
+        mock_reader.pages = [mock_page]
 
-            with patch("pypdf.PdfReader", return_value=mock_reader):
-                # Ensure OCR is not available
-                with patch.dict("src.config.__dict__", {"OCR_SPACE_API_KEY": None}):
-                    with pytest.raises(
-                        ValueError, match="PDF não contém texto extraível"
-                    ):
-                        await FileParserService.parse_pdf(temp_pdf_file)
+        with patch("pypdf.PdfReader", return_value=mock_reader):
+            # Ensure OCR is not available
+            with patch.dict("src.config.__dict__", {"OCR_SPACE_API_KEY": None}):
+                with pytest.raises(ValueError, match="PDF não contém texto extraível"):
+                    await FileParserService.parse_pdf(temp_pdf_file)
 
     @pytest.mark.asyncio
     async def test_parse_pdf_with_ocr_success(self, temp_pdf_file):
@@ -223,6 +220,3 @@ class TestFileParserService:
                 assert "Direct text" in result
                 # OCR should NOT have been called
                 assert not mock_ocr_result.called
-
-
-

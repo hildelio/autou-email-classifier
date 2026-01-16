@@ -106,16 +106,12 @@ class OCRService:
                     }
 
                     logger.info("Sending PDF to OCR.space API for processing")
-                    response = await client.post(
-                        OCRService.BASE_URL, files=files, data=data
-                    )
+                    response = await client.post(OCRService.BASE_URL, files=files, data=data)
             return response
 
         except httpx.TimeoutException as e:
             logger.error("OCR request timed out")
-            raise ValueError(
-                "OCR request timed out. The file may be too large or complex."
-            ) from e
+            raise ValueError("OCR request timed out. The file may be too large or complex.") from e
         except httpx.HTTPError as e:
             logger.error(f"Network error during OCR: {e}")
             raise ValueError(f"Network error during OCR: {str(e)}") from e
@@ -137,9 +133,7 @@ class OCRService:
         # Check response status
         if response.status_code != 200:
             logger.error(f"OCR API returned status {response.status_code}")
-            raise ValueError(
-                f"OCR API returned status {response.status_code}: {response.text}"
-            )
+            raise ValueError(f"OCR API returned status {response.status_code}: {response.text}")
 
         # Parse response
         result = response.json()
@@ -150,9 +144,7 @@ class OCRService:
             error_msg = result.get("ErrorMessage", ["Unknown error"])
             error_details = result.get("ErrorDetails", "")
             logger.error(f"OCR processing error: {error_msg}")
-            raise ValueError(
-                f"OCR processing error: {error_msg}. Details: {error_details}"
-            )
+            raise ValueError(f"OCR processing error: {error_msg}. Details: {error_details}")
 
         # Success - extract text
         parsed_results = result.get("ParsedResults", [])

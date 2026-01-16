@@ -98,13 +98,9 @@ class TestOCRService:
             }
 
             with patch("httpx.AsyncClient") as mock_client:
-                mock_client.return_value.__aenter__.return_value.post.return_value = (
-                    mock_response
-                )
+                mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
 
-                response = await OCRService._send_ocr_request(
-                    temp_pdf_file, Path(temp_pdf_file)
-                )
+                response = await OCRService._send_ocr_request(temp_pdf_file, Path(temp_pdf_file))
 
                 assert response.status_code == 200
 
@@ -118,9 +114,7 @@ class TestOCRService:
                 )
 
                 with pytest.raises(ValueError, match="OCR request timed out"):
-                    await OCRService._send_ocr_request(
-                        temp_pdf_file, Path(temp_pdf_file)
-                    )
+                    await OCRService._send_ocr_request(temp_pdf_file, Path(temp_pdf_file))
 
     @pytest.mark.asyncio
     async def test_send_ocr_request_network_error(self, temp_pdf_file):
@@ -132,9 +126,7 @@ class TestOCRService:
                 )
 
                 with pytest.raises(ValueError, match="Network error during OCR"):
-                    await OCRService._send_ocr_request(
-                        temp_pdf_file, Path(temp_pdf_file)
-                    )
+                    await OCRService._send_ocr_request(temp_pdf_file, Path(temp_pdf_file))
 
     # --- Response Parsing Tests ---
 
@@ -204,9 +196,7 @@ class TestOCRService:
     # --- Integration Tests ---
 
     @pytest.mark.asyncio
-    async def test_extract_text_from_pdf_success(
-        self, temp_pdf_file, mock_success_response
-    ):
+    async def test_extract_text_from_pdf_success(self, temp_pdf_file, mock_success_response):
         """Test complete successful OCR extraction flow"""
         with patch("src.services.ocr_service.OCR_SPACE_API_KEY", "test_key"):
             mock_response = Mock(spec=httpx.Response)
@@ -214,9 +204,7 @@ class TestOCRService:
             mock_response.json.return_value = mock_success_response
 
             with patch("httpx.AsyncClient") as mock_client:
-                mock_client.return_value.__aenter__.return_value.post.return_value = (
-                    mock_response
-                )
+                mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
 
                 text = await OCRService.extract_text_from_pdf(temp_pdf_file)
                 assert text == "This is extracted text from OCR"
@@ -271,8 +259,8 @@ class TestOCRService:
         """Test OCR extraction handles unexpected errors"""
         with patch("src.services.ocr_service.OCR_SPACE_API_KEY", "test_key"):
             with patch("httpx.AsyncClient") as mock_client:
-                mock_client.return_value.__aenter__.return_value.post.side_effect = (
-                    RuntimeError("Unexpected error")
+                mock_client.return_value.__aenter__.return_value.post.side_effect = RuntimeError(
+                    "Unexpected error"
                 )
 
                 with pytest.raises(ValueError, match="Unexpected error during OCR"):
