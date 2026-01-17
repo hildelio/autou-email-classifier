@@ -4,7 +4,10 @@
  */
 
 // Configuration
-const API_BASE_URL = 'http://localhost:8000/api';
+// Use relative URL to work in both dev and production
+const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:8000/api'
+    : '/api';
 const MAX_FILE_SIZE_MB = 5;
 const MAX_TEXT_LENGTH = 1000000;
 
